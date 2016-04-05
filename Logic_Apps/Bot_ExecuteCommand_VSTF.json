@@ -1,0 +1,172 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "logicAppName": {
+            "type": "string",
+            "defaultValue": "Bot_VSTF_Create"
+        },
+        "svcPlanName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the App Service plan to create for hosting the logic app."
+            }
+        },
+        "sku": {
+            "type": "string",
+            "defaultValue": "Standard",
+            "allowedValues": [
+                "Free",
+                "Basic",
+                "Standard",
+                "Premium"
+            ],
+            "metadata": {
+                "description": "The pricing tier for the logic app."
+            }
+        },
+        "svcPlanSize": {
+            "defaultValue": "0",
+            "type": "string",
+            "allowedValues": [
+                "0",
+                "1",
+                "2"
+            ],
+            "metadata": {
+                "description": "The instance size of the app."
+            }
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "apiVersion": "2014-06-01",
+            "name": "[parameters('svcPlanName')]",
+            "type": "Microsoft.Web/serverfarms",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "AppServicePlan"
+            },
+            "properties": {
+                "name": "[parameters('svcPlanName')]",
+                "sku": "[parameters('sku')]",
+                "workerSize": "[parameters('svcPlanSize')]",
+                "numberOfWorkers": 1
+            }
+        },
+        {
+            "type": "Microsoft.Logic/workflows",
+            "apiVersion": "2015-02-01-preview",
+            "name": "[parameters('logicAppName')]",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "LogicApp"
+            },
+            "properties": {
+                "sku": {
+                    "name": "[parameters('sku')]",
+                    "plan": {
+                        "id": "[concat(resourceGroup().id, '/providers/Microsoft.Web/serverfarms/',parameters('svcPlanName'))]"
+                    }
+                },
+                "definition": {
+                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2015-08-01-preview/workflowdefinition.json#",
+                    "actions": {
+                        "ExecuteQuery_getTopItems": {
+                            "conditions": [
+                                {
+                                    "dependsOn": "Get_file_content_using_path"
+                                }
+                            ],
+                            "inputs": {
+                                "method": "get",
+                                "queries": {
+                                    "count": 10,
+                                    "query": "@{body('Get_file_content_using_path')}",
+                                    "requestedCollectionUri": "http://myvisualstudioteamfoundation",
+                                    "requestedProject": "My Project"
+                                },
+                                "uri": "https://myvsapi.azurewebsites.net/api/ExecuteQuery"
+                            },
+                            "metadata": {
+                                "apiDefinitionUrl": "https://myvsapi.azurewebsites.net/swagger/docs/v1",
+                                "swaggerSource": "website"
+                            },
+                            "type": "Http"
+                        },
+                        "Get_file_content_using_path": {
+                            "conditions": [],
+                            "inputs": {
+                                "host": {
+                                    "api": {
+                                        "runtimeUrl": "https://logic-apis-eastus.azure-apim.net/apim/azureblob"
+                                    },
+                                    "connection": {
+                                        "name": "@parameters('$connections')['azureblob']['connectionId']"
+                                    }
+                                },
+                                "method": "get",
+                                "path": "/datasets/default/GetFileContentByPath",
+                                "queries": {
+                                    "path": "/logicapps/@{triggerBody()['blobName']}"
+                                }
+                            },
+                            "type": "ApiConnection"
+                        },
+                        "Response": {
+                            "conditions": [
+                                {
+                                    "dependsOn": "ExecuteQuery_getTopItems"
+                                }
+                            ],
+                            "inputs": {
+                                "body": "@body('ExecuteQuery_getTopItems')",
+                                "headers": {
+                                    "Content-Type": "application/json"
+                                },
+                                "statusCode": 200
+                            },
+                            "type": "Response"
+                        }
+                    },
+                    "contentVersion": "1.0.0.0",
+                    "outputs": {},
+                    "parameters": {
+                        "$connections": {
+                            "defaultValue": {},
+                            "type": "Object"
+                        }
+                    },
+                    "triggers": {
+                        "manual": {
+                            "inputs": {
+                                "schema": {
+                                    "properties": {
+                                        "blobName": {
+                                            "id": "blobName",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "blobName"
+                                    ],
+                                    "type": "object"
+                                }
+                            },
+                            "type": "Manual"
+                        }
+                    }
+                },
+                "parameters": {
+                    "$connections": {
+                        "azureblob":{
+                            "connectionId":"/some/connection/id"
+                        }
+                    }
+                }
+            }
+        }
+    ],
+    "outputs": {}
+}

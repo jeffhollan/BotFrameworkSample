@@ -1,0 +1,146 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "logicAppName": {
+            "type": "string",
+            "defaultValue": "Bot_VSTF_Create"
+        },
+        "svcPlanName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the App Service plan to create for hosting the logic app."
+            }
+        },
+        "sku": {
+            "type": "string",
+            "defaultValue": "Standard",
+            "allowedValues": [
+                "Free",
+                "Basic",
+                "Standard",
+                "Premium"
+            ],
+            "metadata": {
+                "description": "The pricing tier for the logic app."
+            }
+        },
+        "svcPlanSize": {
+            "defaultValue": "0",
+            "type": "string",
+            "allowedValues": [
+                "0",
+                "1",
+                "2"
+            ],
+            "metadata": {
+                "description": "The instance size of the app."
+            }
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "apiVersion": "2014-06-01",
+            "name": "[parameters('svcPlanName')]",
+            "type": "Microsoft.Web/serverfarms",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "AppServicePlan"
+            },
+            "properties": {
+                "name": "[parameters('svcPlanName')]",
+                "sku": "[parameters('sku')]",
+                "workerSize": "[parameters('svcPlanSize')]",
+                "numberOfWorkers": 1
+            }
+        },
+        {
+            "type": "Microsoft.Logic/workflows",
+            "apiVersion": "2015-02-01-preview",
+            "name": "[parameters('logicAppName')]",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "LogicApp"
+            },
+            "properties": {
+                "sku": {
+                    "name": "[parameters('sku')]",
+                    "plan": {
+                        "id": "[concat(resourceGroup().id, '/providers/Microsoft.Web/serverfarms/',parameters('svcPlanName'))]"
+                    }
+                },
+                "definition": {
+                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2015-08-01-preview/workflowdefinition.json#",
+                    "actions": {
+                        "Response": {
+                            "conditions": [
+                                {
+                                    "dependsOn": "SearchItem_SearchItem"
+                                }
+                            ],
+                            "inputs": {
+                                "body": "@body('SearchItem_SearchItem')",
+                                "headers": {
+                                    "content-type": "application/json"
+                                },
+                                "statusCode": 200
+                            },
+                            "type": "Response"
+                        },
+                        "SearchItem_SearchItem": {
+                            "conditions": [],
+                            "inputs": {
+                                "body": {
+                                    "query": "@{triggerBody()['query']}",
+                                    "type": "@{triggerBody()['type']}"
+                                },
+                                "method": "post",
+                                "queries": {
+                                    "count": 5,
+                                    "requestedCollectionUri": "http://myvisualstudioteamfoundation",
+                                    "requestedProject": "My Project"
+                                },
+                                "uri": "https://myvsapi.azurewebsites.net/api/tfs/search"
+                            },
+                            "metadata": {
+                                "apiDefinitionUrl": "https://myvsapi.azurewebsites.net/swagger/docs/v1",
+                                "swaggerSource": "website"
+                            },
+                            "type": "Http"
+                        }
+                    },
+                    "contentVersion": "1.0.0.0",
+                    "outputs": {},
+                    "parameters": {},
+                    "triggers": {
+                        "manual": {
+                            "inputs": {
+                                "schema": {
+                                    "properties": {
+                                        "query": {
+                                            "id": "http://jsonschema.net/query",
+                                            "type": "string"
+                                        },
+                                        "type": {
+                                            "id": "http://jsonschema.net/type",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "query",
+                                        "type"
+                                    ],
+                                    "type": "object"
+                                }
+                            },
+                            "type": "Manual"
+                        }
+                    }
+                },
+                "parameters": {}
+            }
+        }
+    ],
+    "outputs": {}
+}
