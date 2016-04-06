@@ -34,7 +34,7 @@ namespace VSTF_RD_Bot
                 AuthenticationContext ac = new AuthenticationContext("https://login.windows.net/common/oauth2/authorize/");
                 ar = DateTimeOffset.Compare(DateTimeOffset.Now, ar.ExpiresOn) < 0 ? ar : await ac.AcquireTokenByRefreshTokenAsync(ar.RefreshToken, new ClientCredential(Constants.ADClientId, Constants.ADClientSecret));
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 return message.CreateReplyMessage($"You must authenticate to use bot: https://jehollanVSBot.azurewebsites.net/api/{message.From.Id}/login");
             }

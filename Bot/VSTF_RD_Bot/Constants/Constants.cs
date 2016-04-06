@@ -29,7 +29,7 @@ namespace VSTF_RD_Bot
 
         internal static string ADClientId = ConfigurationManager.AppSettings["ADClientId"];
 
-        internal static string ADClientSecrent = ConfigurationManager.AppSettings["ADClientSecret"];
+        internal static string ADClientSecret = ConfigurationManager.AppSettings["ADClientSecret"];
 
         internal static string apiBasePath = ConfigurationManager.AppSettings["apiBasePath"].ToLower();
 

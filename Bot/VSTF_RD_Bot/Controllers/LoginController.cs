@@ -27,7 +27,7 @@ namespace VSTF_RD_Bot.Controllers
         public async System.Threading.Tasks.Task<HttpResponseMessage> Authorize(string userid, string code)
         {
             AuthenticationContext ac = new AuthenticationContext("https://login.windows.net/common/oauth2/authorize/");
-            ClientCredential cc = new ClientCredential(Constants.ADClientId, Constants.ADClientSecrent);
+            ClientCredential cc = new ClientCredential(Constants.ADClientId, Constants.ADClientSecret);
             AuthenticationResult ar = await ac.AcquireTokenByAuthorizationCodeAsync(code, new Uri(Constants.apiBasePath + userid + "/authorize"), cc);
             if (!String.IsNullOrEmpty(ar.AccessToken))
             {
