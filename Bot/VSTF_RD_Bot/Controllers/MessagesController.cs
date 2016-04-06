@@ -12,6 +12,7 @@ using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Text.RegularExpressions;
+using Microsoft.IdentityModel.Clients.ActiveDirectory;
 
 namespace VSTF_RD_Bot
 {
@@ -26,11 +27,18 @@ namespace VSTF_RD_Bot
         public async Task<Message> Post([FromBody]Message message)
         {
             #region Check Authorization
-            string d = (string)message.BotUserData;
-            if (d != "authorized")
+            try
+            {
+                string d = (string)message.BotUserData;
+                AuthenticationResult ar = AuthenticationResult.Deserialize(d);
+                AuthenticationContext ac = new AuthenticationContext("https://login.windows.net/common/oauth2/authorize/");
+                ar = DateTimeOffset.Compare(DateTimeOffset.Now, ar.ExpiresOn) < 0 ? ar : await ac.AcquireTokenByRefreshTokenAsync(ar.RefreshToken, new ClientCredential(Constants.ADClientId, Constants.ADClientSecret));
+            }
+            catch (Exception ex)
             {
                 return message.CreateReplyMessage($"You must authenticate to use bot: https://jehollanVSBot.azurewebsites.net/api/{message.From.Id}/login");
             }
+            
             #endregion
 
             if (message.Type == "Message")

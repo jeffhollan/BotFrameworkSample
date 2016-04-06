@@ -33,7 +33,7 @@ namespace VSTF_RD_Bot.Controllers
             {
                 var client = new ConnectorClient();
                 var getData = await client.Bots.GetUserDataAsync(Constants.botId, userid);
-                getData.Data = "authorized";
+                getData.Data = ar.Serialize();
                 var foo = await client.Bots.SetUserDataAsync(Constants.botId, userid, getData);
 
                 //return Request.CreateResponse(foo);
