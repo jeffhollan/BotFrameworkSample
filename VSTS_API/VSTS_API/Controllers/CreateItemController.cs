@@ -8,7 +8,6 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using TRex.Metadata;
-using VSTS_API.App_Start;
 using VSTS_API.Models;
 
 namespace VSTF_API.Controllers
@@ -28,7 +27,7 @@ namespace VSTF_API.Controllers
             TfsTeamProjectCollection tpc = new TfsTeamProjectCollection(collectionUri, new NetworkCredential(username, password, domain));
             WorkItemStore workItemStore = tpc.GetService<WorkItemStore>();
             Project teamProject = workItemStore.Projects[requestedProject];
-            WorkItemType workItemType = teamProject.WorkItemTypes[Utils.GetTFSType(requestedWorkItem.Type)];
+            WorkItemType workItemType = teamProject.WorkItemTypes[VSTS_API.Utils.Mappings.GetTFSType(requestedWorkItem.Type)];
 
             // Create the work item. 
             WorkItem newWorkItem = new WorkItem(workItemType)

@@ -7,7 +7,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using VSTS_API.App_Start;
 using VSTS_API.Models;
 
 namespace VSTS_API.Controllers

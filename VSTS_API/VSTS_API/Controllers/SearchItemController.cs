@@ -8,7 +8,6 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using TRex.Metadata;
-using VSTS_API.App_Start;
 using VSTS_API.Models;
 
 namespace VSTS_API.Controllers
@@ -23,7 +22,7 @@ namespace VSTS_API.Controllers
         [Metadata("Search TFS")]
         public HttpResponseMessage SearchItem([FromUri] string requestedCollectionUri, [FromUri] string requestedProject, [FromUri] int count, [FromBody] BasicQuery query)
         {
-            string type = Utils.GetTFSType(query.type);
+            string type = Utils.Mappings.GetTFSType(query.type);
             string filter = query.query;
 
             Uri collectionUri = new Uri(requestedCollectionUri);
@@ -50,6 +49,7 @@ namespace VSTS_API.Controllers
         }
 
         
+
     }
     
 }
