@@ -51,9 +51,18 @@ namespace VSTS_API.Controllers
                     "application/json-patch+json");
 
                 var res = await client.SendAsync(vso_request);
+                var res_with_edit_url = appendEditUrl(JObject.Parse((await res.Content.ReadAsStringAsync())), item);
 
-                return res;
+                return Request.CreateResponse(res_with_edit_url);
             }
+        }
+
+        private object appendEditUrl(JObject obj, WorkItemRequest item)
+        {
+            var api_url = (string)obj["url"];
+            api_url = api_url.Replace("DefaultCollection", item.project).Replace("_apis/wit/w", "_w").Replace("Items/", "Items/edit/");
+            obj["edit_url"] = api_url;
+            return obj;
         }
     }
 }

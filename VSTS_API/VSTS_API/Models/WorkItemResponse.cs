@@ -110,6 +110,8 @@ namespace VSTS_API.Models
         public Fields fields { get; set; }
         public Links _links { get; set; }
         public string url { get; set; }
+
+        public string edit_url { get; set; }
     }
 
 }
