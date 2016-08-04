@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VSTS_API", "VSTS_API\VSTS_API.csproj", "{F3A9B11F-BA25-4FB8-95CD-A53D1B1E40F3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VSO_API", "VSTS_API\VSO_API.csproj", "{F3A9B11F-BA25-4FB8-95CD-A53D1B1E40F3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VSTS_API.Tests", "VSTS_API.Tests\VSTS_API.Tests.csproj", "{B97A3EB0-B719-4F01-B5BA-24312490533E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VSO_API.Tests", "VSTS_API.Tests\VSO_API.Tests.csproj", "{B97A3EB0-B719-4F01-B5BA-24312490533E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
