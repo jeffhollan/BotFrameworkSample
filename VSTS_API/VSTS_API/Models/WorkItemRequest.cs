@@ -4,18 +4,22 @@ using System.Linq;
 using System.Web;
 using System.ComponentModel.DataAnnotations;
 using TRex.Metadata;
+using System.Runtime.Serialization;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json;
 
 namespace VSTS_API.Models
 {
     public class WorkItemRequest
     {
-        [Metadata("Access Token", "Basic auth value for request header - base64 :accesstoken")]
+        [Metadata("Access Token", "Basic auth value for request header - base64 `:accesstoken`")]
         public string access_token { get; set; }
         [Required]
         public string instance { get; set; }
         [Required]
         public string project { get; set; }
         [Required]
+        [JsonConverter(typeof(StringEnumConverter))]
         public workItemEnum workItemType { get; set; }
         
         public string area_path { get; set; }
@@ -51,10 +55,10 @@ namespace VSTS_API.Models
         public string getWorkItemTypeURL()
         {
              var dict = new Dictionary<workItemEnum, string> {
-                 {  workItemEnum.BUG, "$Bug"  },
-                 {  workItemEnum.FEATURE, "$Feature"  },
-                 {  workItemEnum.TASK, "$Task"  },
-                 {  workItemEnum.EPIC, "$Epic"  },
+                 {  workItemEnum.Bug, "$Bug"  },
+                 {  workItemEnum.Feature, "$Feature"  },
+                 {  workItemEnum.Task, "$Task"  },
+                 {  workItemEnum.Epic, "$Epic"  },
                  {  workItemEnum.PBI, "$Product%20Backlog%20Item"  }
                 };
 
@@ -62,7 +66,7 @@ namespace VSTS_API.Models
         }    
         public enum workItemEnum
         {
-            BUG=0, FEATURE=1, TASK=2, EPIC=3, [Display(Name="Product Backlog Item")]PBI=4
+            Bug, Feature, Task, Epic, [EnumMember(Value="Product Backlog Item")]PBI
         }
     }
 }
